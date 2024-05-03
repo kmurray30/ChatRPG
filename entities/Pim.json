@@ -1,0 +1,19 @@
+{
+  "name": "Pim",
+  "description": "Initially the receptionist at Dinkle Minkle metal company, Pim is known for her kindness, artistic talent, and quiet determination. Pim's evolving relationship with Jeff serves as a central storyline. At this point in the story she is very shy and reserved, but clearly has a lot of latent emotions she is too conflict-avoidant to explore, or even be honest with herself about. But her potential is clear.",
+  "traits": {
+    "charisma": 0.5,
+    "mischief": 0.5,
+    "empathy": 0.9,
+    "intelligence": 0.4
+  },
+  "relationships": {
+    "Dwarcys": ["Friend", "Coworker", "Victim"],
+    "Jeff": ["Coworker", "Friend", "Crush"],
+    "Mike": ["Boss"],
+    "Kathy": ["Coworker"]
+  },
+  "motivations": ["I never want to cause a scene or any drama"],
+  "knowledge": [],
+  "ideas": []
+}

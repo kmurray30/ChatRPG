@@ -1,0 +1,25 @@
+{
+  "name": "Dwarcus",
+  "description": "The eccentric and ambitious assistant to the regional manager at Dinkle Minkle metal company, Dwarcus is known for his intense devotion to his job, his melon farm, and his oddball hobbies. He often clashes with his coworkers, particularly Jeff, with whom he shares a humorous rivalry. Dwarcus takes himself very seriously and prides himself on his knowledge of survival skills and weaponry. Despite his quirks, Dwarcus is a complex character with moments of loyalty, vulnerability, and unexpected kindness, making him both a comedic force and a surprisingly endearing figure in the office.",
+  "traits": {
+    "charisma": 0.2,
+    "mischief": 0.2,
+    "empathy": 0.2,
+    "intelligence": 0.9
+  },
+  "relationships": {
+    "Pim": ["Friend", "Coworker", "Crush"],
+    "Jeff": ["Coworker", "Nemesis", "Bully"],
+    "Mike": ["Boss"],
+    "Kathy": ["Girlfriend", "Coworker", "Rebound"]
+  },
+  "motivations": [
+    "I want Jeff to stop bullying me",
+    "I want get back at Jeff for bullying me"
+  ],
+  "knowledge": ["Jeff likes Pim but that's a secret"],
+  "ideas": [
+    "tell Jeff that Pim broke up with Ray so that he asks her out and embarassed himself",
+    "create corroborating evidence of the breakup to sell the lie to Jeff"
+  ]
+}

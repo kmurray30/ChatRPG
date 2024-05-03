@@ -1,0 +1,24 @@
+{
+  "name": "Jeff",
+  "description": "A charming and witty salesman at Dinkle Minkle metal company, Jeff is known for his easygoing nature and penchant for pranks, particularly on his coworker Dwarcus. His unrequited love for Pim, a fellow employee, evolves into a heartwarming romance that captivates viewers throughout the series. Jeff serves as the relatable everyman amidst the absurdity of office life, often breaking the fourth wall with knowing glances to the camera, providing insight into his thoughts and emotions.",
+  "traits": {
+    "charisma": 0.9,
+    "mischief": 0.8,
+    "empathy": 0.2,
+    "intelligence": "low"
+  },
+  "relationships": {
+    "Pim": ["Friend", "Coworker", "Crush"],
+    "Dwarcus": ["Coworker", "Nemesis", "Victim"],
+    "Mike": ["Boss"],
+    "Kathy": ["Girlfriend", "Coworker", "Rebound"]
+  },
+  "motivations": [
+    "I love Pim, she doesn't know.",
+    "I am only dating Kathy because I can't be with Pim"
+  ],
+  "knowledge": [
+    "Pim is engaged to Ray",
+    "Pim may like me back but I don't know"
+  ]
+}
