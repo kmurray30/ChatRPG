@@ -5,31 +5,33 @@
 Depending how much coding you've done before, you may need to install some things on your computer to get started. Here we'll install homebrew, python3, git, vscode, and the vscode extensions we'll be using.
 
 1. Install homebrew (mac) or chocolatey (windows)
+   1. homebrew: https://brew.sh
+   1. chocolately: go get a mac
 2. Install python3
-3. Install git
-   a. `brew install git` or `choco install git`
-   b. `brew install gh` or `choco install gh`
-   c. `git config --global user.name "Your Name"`
-   d. `gh auth login` and follow the prompts to login with your github account
-   e. `git clone <repo url>` (run this in the dir you want the repo to be in)
+   1. `brew install python3`
+3. Install and set up git
+   1. `brew install git` or `choco install git`
+   1. `brew install gh` or `choco install gh`
+   1. `git config --global user.name "Your Name"`
+   1. `gh auth login` and follow the prompts to login with your github account
+   1. `git clone <repo url>` (run this in the dir you want the repo to be in)
 4. Install vscode (from browser). Then inside vscode:
-   a. Install the python extension for vscode
-   b. Install the copilot extension for vscode
-   c. You can open your repo folder in vscode by running `code .` in the repo folder top level directory
+   1. Install the python extension for vscode
+   1. Install the copilot extension for vscode
+   1. You can open your repo folder in vscode by running `code .` in the repo folder top level directory
 
 ## Repo Setup
 
 These are the steps to get the repo set up on your local machine. Things like python packages and environment variables are intentionally excluded from git via the .gitignore file, so we will set them up locally here.
 
 1. Set up the virtual environment
-   a. `python3 -m venv .venv` (this will create a virtual environment in the .venv folder in the repo. Virtual environments are used to keep the python packages for this project separate from other projects on your computer)
-   b. `source .venv/bin/activate` (this will activate the virtual environment. You will need to do this every time you open a new terminal window to work on this project)
-   c. `pip install -r requirements.txt` (this will install all the python packages needed for the project)
+   1. `python3 -m venv .venv` (this will create a virtual environment in the .venv folder in the repo. Virtual environments are used to keep the python packages for this project separate from other projects on your computer)
+   1. `source .venv/bin/activate` (this will activate the virtual environment. You will need to do this every time you open a new terminal window to work on this project)
+   1. `pip install -r requirements.txt` (this will install all the python packages needed for the project)
+   1. Set the .venv in vscode to make linting work (bottom right of screen, point it to your local venv)
 2. Set up the .env file
-   a. Copy the .env.example file to a new file called .env
-   b. Fill in the values in the .env file (get this from the team)
-   .venv
-   Set the .venv in vscode to make linting work (bottom right of screen, point it to your local venv)
+   1. Copy the .env.example file to a new file called .env
+   1. Fill in the values in the .env file (get this from the team)
 
 ## Reminders
 
