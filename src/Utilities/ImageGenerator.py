@@ -22,6 +22,10 @@ def generate_image_url(prompt):
     image_url = response.data[0].url
     return image_url
 
+def generate_and_display_image(prompt):
+    image_url = generate_image_url(prompt)
+    webbrowser.open(image_url)
+
 def main():
     print("Welcome to the Image Generator!")
     while True:
@@ -29,8 +33,7 @@ def main():
         if user_input.lower() == "exit":
             break
         if user_input:
-          image_url = generate_image_url(user_input)
-          webbrowser.open(image_url)
+            generate_and_display_image(user_input)
 
 if __name__ == "__main__":
     main()

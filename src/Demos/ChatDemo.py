@@ -1,7 +1,8 @@
-import openai
-from openai import OpenAI
-from dotenv import load_dotenv
 import os
+
+import openai
+from dotenv import load_dotenv
+from openai import OpenAI
 
 # Read more at: https://platform.openai.com/docs/quickstart
 

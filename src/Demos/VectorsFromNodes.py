@@ -1,21 +1,25 @@
 import atexit
-import os
 import json
+import os
+import sys
 import uuid
 
 import openai
 from dotenv import load_dotenv
-from llama_index.core.schema import (TextNode)
-from llama_index.core import (SimpleDirectoryReader, StorageContext,
-                              VectorStoreIndex, load_index_from_storage, Document)
+from llama_index.core import (Document, SimpleDirectoryReader, StorageContext,
+                              VectorStoreIndex, load_index_from_storage)
+from llama_index.core.schema import TextNode
 from llama_index.core.tools import QueryEngineTool, ToolMetadata
 from llama_index.vector_stores.milvus import MilvusVectorStore
 from milvus import default_server
 
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from Utilities.Utilities import get_path_from_project_root
+
 load_dotenv()
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
-data_files_path = "../../entities/"
+data_files_path = get_path_from_project_root("entities/")
 
 def generate_guid():
     return str(uuid.uuid4())
@@ -57,7 +61,7 @@ def loadVectors(storeName):
     # Load vectors
     try:
         storage_context = StorageContext.from_defaults(
-            persist_dir=f"../../storage/{storeName}"
+            persist_dir=get_path_from_project_root(f"storage/{storeName}")
         )
         index = load_index_from_storage(storage_context)
 
@@ -76,7 +80,7 @@ def loadVectors(storeName):
         index = VectorStoreIndex(nodes, storage_context=storage_context)
 
         # persist index
-        index.storage_context.persist(persist_dir=f"../../storage/{storeName}")
+        index.storage_context.persist(persist_dir=get_path_from_project_root(f"storage/{storeName}"))
 
     engine = index.as_query_engine(similarity_top_k=3)
 

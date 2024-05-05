@@ -5,7 +5,9 @@ import openai
 from dotenv import load_dotenv
 from openai import OpenAI
 
-from ChatBot import call_openai_simple
+from .ChatBot import call_openai_simple
+
+from .Utilities import get_path_from_project_root
 
 load_dotenv()
 openai.api_key = os.getenv("OPENAI_API_KEY")
@@ -29,7 +31,36 @@ def convert_text_to_speech_file(prompt, file_path):
       voice="alloy",
       input=prompt
     )) as response:
+        if response.status_code != 200:
+            print(f"Failed to convert the text to speech. Status code: {response.status_code}")
+            return
+        print(f"Saving the speech to {os.path.abspath(file_path)}")  
+        os.makedirs(os.path.dirname(file_path), exist_ok=True)
         response.stream_to_file(file_path)
+
+def convert_play_delete_text_to_speech_file(prompt, summary_as_filename=False, delete=True):
+    # Generate a file name based on the user input
+    if delete:
+        path = get_path_from_project_root("audio/temp/")
+    else:
+        path = get_path_from_project_root("audio/")
+    if summary_as_filename:
+        summary = call_openai_simple("Summarize the following into 1-4 words (and no special characters): " + prompt).rstrip('.')
+        speech_file_name = f"{summary}.mp3"
+        speech_file_path = path + speech_file_name
+    else:
+        speech_file_name = "temp.mp3"
+        speech_file_path = path + speech_file_name
+
+    # Generate the speech file
+    convert_text_to_speech_file(prompt, speech_file_path)
+
+    # Play the speech file
+    play_audio_file(speech_file_path)
+
+    # Delete the speech file
+    if delete:
+        delete_audio_file(speech_file_path)
 
 def main():
     print("Welcome to the Text to Speech Converter!")
@@ -38,19 +69,7 @@ def main():
         if user_input.lower() == "exit":
             break
         if user_input:
-            # Generate a file name based on the user input
-            summary = call_openai_simple("Summarize the following into 1-4 words (and no special characters): " + user_input).rstrip('.')
-            speech_file_name = f"{summary}.mp3"
-            speech_file_path = "../../audio/temp/" + speech_file_name
-
-            # Generate the speech file
-            convert_text_to_speech_file(user_input, speech_file_path)
-
-            # Play the speech file
-            play_audio_file(speech_file_path)
-
-            # Delete the speech file
-            delete_audio_file(speech_file_path)
+            convert_play_delete_text_to_speech_file(user_input)      
 
 if __name__ == "__main__":
     main()
