@@ -46,7 +46,7 @@ llama-index-vector-stores-milvus==0.1.10
 llama-parse==0.4.2
 llamaindex-py-client==0.1.19
 marshmallow==3.21.1
-milvus==2.3.8
+milvus==2.3.5
 minio==7.2.6
 multidict==6.0.5
 mypy-extensions==1.0.0
