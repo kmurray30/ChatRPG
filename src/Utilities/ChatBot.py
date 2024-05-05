@@ -1,7 +1,8 @@
-import openai
-from openai import OpenAI
-from dotenv import load_dotenv
 import os
+
+import openai
+from dotenv import load_dotenv
+from openai import OpenAI
 
 # Load the OpenAI API key from the .env file and initialize the OpenAI client
 load_dotenv()
@@ -25,7 +26,14 @@ def call_openai_and_update_chat_messages(prompt, chat_messages):
     chat_messages.append({"role": "assistant", "content": response})
     return response
 
+def call_openai_simple(prompt):
+    chatGptMessages = [
+        {"role": "system", "content": "You are a helpful assistant."}
+    ]
+    return call_openai_and_update_chat_messages(prompt, chatGptMessages)
+
 def main():
+    print("Welcome to the ChatBot!")
     chatGptMessages = [
         {"role": "system", "content": "You are a helpful assistant."}
     ]
