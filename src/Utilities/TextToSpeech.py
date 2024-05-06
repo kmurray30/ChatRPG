@@ -5,18 +5,28 @@ import openai
 from dotenv import load_dotenv
 from openai import OpenAI
 
-from .ChatBot import call_openai_simple
-
-from .Utilities import get_path_from_project_root
+from ChatBot import call_openai_simple
+from Utilities import get_path_from_project_root
 
 load_dotenv()
 openai.api_key = os.getenv("OPENAI_API_KEY")
 client = OpenAI()
 
-from playsound import playsound
+# from playsound import playsound
+from pygame import mixer
+
+# Starting the mixer 
+mixer.init() 
 
 def play_audio_file(file_path):
-    playsound(file_path)
+    # Loading the song 
+    mixer.music.load(file_path) 
+      
+    # Setting the volume 
+    mixer.music.set_volume(0.7) 
+      
+    # Start playing the song 
+    mixer.music.play() 
 
 def delete_audio_file(file_path):
     # only delete audio files in the audio directory
