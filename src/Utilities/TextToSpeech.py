@@ -1,7 +1,7 @@
 import os
 from pathlib import Path
 from os import environ
-environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1'
+# environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1'
 
 import openai
 # from dotenv import load_dotenv
@@ -20,25 +20,24 @@ init_dotenv()
 openai.api_key = os.getenv("OPENAI_API_KEY")
 client = OpenAI()
 
-# from playsound import playsound
-from pygame import mixer
-
-# Starting the mixer 
-mixer.init() 
+import simpleaudio as sa
 
 def play_audio_file(file_path):
-    # Loading the song 
-    mixer.music.load(file_path) 
-      
-    # Setting the volume 
-    mixer.music.set_volume(0.7) 
-      
-    # Start playing the song 
-    mixer.music.play() 
+    try:
+        # Load the audio file from the provided path
+        wave_obj = sa.WaveObject.from_wave_file(file_path)
+        
+        # Play the audio
+        play_obj = wave_obj.play()
+        
+        # Wait for the audio to finish playing
+        play_obj.wait_done()
+    except Exception as e:
+        print(f"An error occurred while playing the audio: {e}")
 
 def delete_audio_file(file_path):
     # only delete audio files in the audio directory
-    if os.path.exists(file_path) and "/audio/" in file_path and Path(file_path).suffix == ".mp3":
+    if os.path.exists(file_path) and "/audio/" in file_path and Path(file_path).suffix == ".wav":
         os.remove(file_path)
     else:
         print("The file does not exist")
@@ -47,7 +46,8 @@ def convert_text_to_speech_file(prompt, file_path):
     with (client.audio.speech.with_streaming_response.create(
       model="tts-1",
       voice="echo",
-      input=prompt
+      input=prompt,
+      response_format="wav"
     )) as response:
         if response.status_code != 200:
             print(f"Failed to convert the text to speech. Status code: {response.status_code}")
@@ -63,10 +63,10 @@ def create_file_path(prompt, summary_as_filename=False, delete=True):
         path = get_path_from_project_root("audio/")
     if summary_as_filename:
         summary = call_openai_simple("Summarize the following into 1-4 words (and no special characters): " + prompt).rstrip('.')
-        speech_file_name = f"{summary}.mp3"
+        speech_file_name = f"{summary}.wav"
         speech_file_path = path + speech_file_name
     else:
-        speech_file_name = f"speech{str(hash(prompt))}.mp3"
+        speech_file_name = f"speech{str(hash(prompt))}.wav"
         speech_file_path = path + speech_file_name
     return speech_file_path
 

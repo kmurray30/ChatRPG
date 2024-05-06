@@ -66,7 +66,6 @@ pycparser==2.22
 pycryptodome==3.20.0
 pydantic==2.7.1
 pydantic_core==2.18.2
-pygame==2.5.2
 pyinstaller==6.6.0
 pyinstaller-hooks-contrib==2024.5
 pymilvus==2.4.1
