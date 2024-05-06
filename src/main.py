@@ -34,7 +34,7 @@ def generate_speech_file(scene_description):
 
 initial_run = True
 intro = "Welcome to the epic adventure that awaits you in Chat RPG. From mystical forests to ancient, bustling cities, explore an infinitely unfolding world shaped by your actions and decisions. With deep and complex NPCs, beautifully generated art, and epic narration, an exciting journey awaits you, if you are ready. Your adventure begins in an unassuming tavern."
-prompt = "Please set up an initial scene in a medieval tavern."
+prompt = "Set up an initial scene in a medieval tavern."
 
 title_screen_path = get_path_from_project_root("assets/title_screen.png")
 webbrowser.open(f"file:///{title_screen_path}")
