@@ -23,12 +23,12 @@ def summarize_and_speak(prompt):
 
 # Function to generate a speech file from the scene description
 def generate_speech_file(scene_description):
-    speech_file_path = TextToSpeech.create_file_path(scene_description, summary_as_filename=False, delete=False)
+    speech_file_path = TextToSpeech.create_file_path(scene_description, summary_as_filename=True, delete=False)
     TextToSpeech.convert_text_to_speech_file(scene_description, speech_file_path)
     return speech_file_path
 
 initial_run = True
-intro = "Welcome to the DnD dungeon master! You will be able to interact with the game by typing in your actions. The game will generate images and audio based on your actions. Let's start by setting up an initial scene."
+intro = "Welcome to the Chat RPG interface! Here, you can interact with an interactive fantasy world by simply typing out your actions. The game will dynamically generate images and audio in response to your input, enriching your experience. Let's begin by establishing an initial scene to set the stage for your adventure."
 prompt = "Please set up an initial scene in the office at dunder mifflin. The player is a new employee at the office"
 while(True):
     with concurrent.futures.ThreadPoolExecutor() as executor:
@@ -61,6 +61,3 @@ while(True):
 
         # Summarize and speak the user input (non-blocking)
         summary_future = executor.submit(summarize_and_speak, prompt)
-
-# TODO: loading dots, better summary of user action, open not in browser, output the text, consistent images, more images per round, UI
-# Feedback: It does too much (will continue scene too far each round), it takes everything the user says as gospel

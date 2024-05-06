@@ -1,12 +1,18 @@
 import os
 from pathlib import Path
+from os import environ
+environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1'
 
 import openai
 from dotenv import load_dotenv
 from openai import OpenAI
 
-from ChatBot import call_openai_simple
-from Utilities import get_path_from_project_root
+if __name__ == "__main__": # If the script is being run directly
+    from ChatBot import call_openai_simple  # Relative import for direct execution
+    from Utilities import get_path_from_project_root
+else: # If the script is being imported
+    from .ChatBot import call_openai_simple  # Package-relative import for when imported by other modules
+    from .Utilities import get_path_from_project_root
 
 load_dotenv()
 openai.api_key = os.getenv("OPENAI_API_KEY")
@@ -38,7 +44,7 @@ def delete_audio_file(file_path):
 def convert_text_to_speech_file(prompt, file_path):
     with (client.audio.speech.with_streaming_response.create(
       model="tts-1",
-      voice="alloy",
+      voice="echo",
       input=prompt
     )) as response:
         if response.status_code != 200:
