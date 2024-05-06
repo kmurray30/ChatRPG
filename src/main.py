@@ -18,7 +18,7 @@ animated_show = "animated tv show"
 
 # Function to summarize and speak the user input
 def summarize_and_speak(prompt):
-    summary = ChatBot.call_openai_simple("Please summarize this, and add some opinionated flavor onto it to make it longer. Refer to the user as the player: " + prompt)
+    summary = ChatBot.call_openai_without_context("Please summarize this, and add some opinionated flavor onto it to make it longer. Refer to the user as the player: " + prompt)
     executor.submit(TextToSpeech.convert_play_delete_text_to_speech_file(summary, summary_as_filename=True, delete=False))
 
 # Function to generate a speech file from the scene description
