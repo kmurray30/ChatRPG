@@ -3,7 +3,6 @@ import os
 def get_project_root():
     # Get the directory of the current script
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    print("script_dir: ", script_dir)
 
     # Get the root directory of the project by going up two levels from the script directory
     project_root = os.path.abspath(os.path.join(script_dir, '../..'))
