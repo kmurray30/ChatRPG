@@ -8,10 +8,10 @@ from dotenv import load_dotenv
 from openai import OpenAI
 
 if __name__ == "__main__": # If the script is being run directly
-    from ChatBot import call_openai_simple  # Relative import for direct execution
+    from ChatBot import call_openai_without_context  # Relative import for direct execution
     from Utilities import get_path_from_project_root
 else: # If the script is being imported
-    from .ChatBot import call_openai_simple  # Package-relative import for when imported by other modules
+    from .ChatBot import call_openai_without_context  # Package-relative import for when imported by other modules
     from .Utilities import get_path_from_project_root
 
 load_dotenv()
@@ -60,7 +60,7 @@ def create_file_path(prompt, summary_as_filename=False, delete=True):
     else:
         path = get_path_from_project_root("audio/")
     if summary_as_filename:
-        summary = call_openai_simple("Summarize the following into 1-4 words (and no special characters): " + prompt).rstrip('.')
+        summary = call_openai_without_context("Summarize the following into 1-4 words (and no special characters): " + prompt).rstrip('.')
         speech_file_name = f"{summary}.mp3"
         speech_file_path = path + speech_file_name
     else:
