@@ -10,6 +10,15 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 
 client = OpenAI()
 
+filename = os.path.splitext(os.path.basename(__file__))[0]
+if __name__ == "__main__" or __name__ == filename: # If the script is being run directly
+    from Utilities import init_dotenv
+else: # If the script is being imported
+    from .Utilities import init_dotenv
+
+# Load the OpenAI API key from the .env file and initialize the OpenAI client
+init_dotenv()
+
 def generate_image_url(prompt):
     response = client.images.generate(
         model="dall-e-3", # options: dall-e-3, dall-e-2

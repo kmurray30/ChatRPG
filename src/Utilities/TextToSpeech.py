@@ -4,17 +4,19 @@ from os import environ
 environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1'
 
 import openai
-from dotenv import load_dotenv
+# from dotenv import load_dotenv
 from openai import OpenAI
 
-if __name__ == "__main__": # If the script is being run directly
+filename = os.path.splitext(os.path.basename(__file__))[0]
+if __name__ == "__main__" or __name__ == filename: # If the script is being run directly
     from ChatBot import call_openai_simple  # Relative import for direct execution
-    from Utilities import get_path_from_project_root
+    from Utilities import (get_path_from_project_root, init_dotenv)
 else: # If the script is being imported
     from .ChatBot import call_openai_simple  # Package-relative import for when imported by other modules
-    from .Utilities import get_path_from_project_root
+    from .Utilities import (get_path_from_project_root, init_dotenv)
 
-load_dotenv()
+# load_dotenv()
+init_dotenv()
 openai.api_key = os.getenv("OPENAI_API_KEY")
 client = OpenAI()
 

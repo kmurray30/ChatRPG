@@ -8,3 +8,4 @@ dalle/
 storage/*
 storage2/*
 audio/
+build/out/

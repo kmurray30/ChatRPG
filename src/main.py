@@ -29,7 +29,7 @@ def generate_speech_file(scene_description):
 
 initial_run = True
 intro = "Welcome to the Chat RPG interface! Here, you can interact with an interactive fantasy world by simply typing out your actions. The game will dynamically generate images and audio in response to your input, enriching your experience. Let's begin by establishing an initial scene to set the stage for your adventure."
-prompt = "Please set up an initial scene in the office at dunder mifflin. The player is a new employee at the office"
+prompt = "Please set up an initial scene in a medieval tavern."
 while(True):
     with concurrent.futures.ThreadPoolExecutor() as executor:
         # For the first iteration, introduce the game to the user via speech
@@ -41,7 +41,7 @@ while(True):
         gtp_scene_description = ChatBot.call_openai_and_update_chat_messages(prompt, chatGptMessages)
 
         # Generate the image from the scene description (non-blocking)
-        image_url_future = executor.submit(ImageGenerator.generate_image_url, f"Generate the following scene in the a {animated_show} style (and please depict the characters accurately, they are from The Office TV show): {gtp_scene_description}")
+        image_url_future = executor.submit(ImageGenerator.generate_image_url, f"Generate the following scene in the a {medieval_tavern} style: {gtp_scene_description}")
 
         # Generate the speech file from the scene description (non-blocking)
         speech_file_future = executor.submit(generate_speech_file, gtp_scene_description)
