@@ -45,7 +45,7 @@ def delete_audio_file(file_path):
 def convert_text_to_speech_file(prompt, file_path):
     with (client.audio.speech.with_streaming_response.create(
       model="tts-1",
-      voice="echo",
+      voice="fable",
       input=prompt,
       response_format="wav"
     )) as response:

@@ -3,7 +3,13 @@ import os
 import concurrent.futures
 import webbrowser
 
-# sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+filename = os.path.splitext(os.path.basename(__file__))[0]
+if __name__ == "__main__" or __name__ == filename: # If the script is being run directly
+    from Utilities.Utilities import get_path_from_project_root
+else: # If the script is being imported
+    from .Utilities.Utilities import get_path_from_project_root
+
 from Utilities import ChatBot
 from Utilities import ImageGenerator
 from Utilities import TextToSpeech
@@ -18,7 +24,7 @@ animated_show = "animated tv show"
 
 # Function to summarize and speak the user input
 def summarize_and_speak(prompt):
-    summary = ChatBot.call_openai_without_context("Please summarize this, and add some opinionated flavor onto it to make it longer. Refer to the user as the player: " + prompt)
+    summary = ChatBot.call_openai_without_context("Summarize this, but make it a bit longer (convert first person to second person): " + prompt)
     executor.submit(TextToSpeech.convert_play_delete_text_to_speech_file(summary, summary_as_filename=True, delete=False))
 
 # Function to generate a speech file from the scene description
@@ -28,8 +34,11 @@ def generate_speech_file(scene_description):
     return speech_file_path
 
 initial_run = True
-intro = "Welcome to the Chat RPG interface! Here, you can interact with an interactive fantasy world by simply typing out your actions. The game will dynamically generate images and audio in response to your input, enriching your experience. Let's begin by establishing an initial scene to set the stage for your adventure."
+intro = "Welcome to the epic adventure that awaits you in Chat RPG. From mystical forests to ancient, bustling cities, explore an infinitely unfolding world shaped by your actions and decisions. With deep and complex NPCs, beautifully generated art, and epic narration, an exciting journey awaits you, if you are ready. Your adventure begins in an unassuming tavern."
 prompt = "Please set up an initial scene in a medieval tavern."
+
+title_screen_path = get_path_from_project_root("assets/title_screen.png")
+webbrowser.open(f"file:///{title_screen_path}")
 while(True):
     with concurrent.futures.ThreadPoolExecutor() as executor:
         # For the first iteration, introduce the game to the user via speech
@@ -41,7 +50,7 @@ while(True):
         gtp_scene_description = ChatBot.call_openai_and_update_chat_messages(prompt, chatGptMessages)
 
         # Generate the image from the scene description (non-blocking)
-        image_url_future = executor.submit(ImageGenerator.generate_image_url, f"Generate the following scene in the a {medieval_tavern} style: {gtp_scene_description}")
+        image_url_future = executor.submit(ImageGenerator.generate_image_url, f"Generate the following scene in the a {medieval_tavern} style, making sure to include a character that looks like aragorn from TLOTR: {gtp_scene_description}")
 
         # Generate the speech file from the scene description (non-blocking)
         speech_file_future = executor.submit(generate_speech_file, gtp_scene_description)
