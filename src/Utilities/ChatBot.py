@@ -32,10 +32,15 @@ def call_openai_simple(prompt):
     ]
     return call_openai_and_update_chat_messages(prompt, chatGptMessages)
 
+def get_chatGptRules():
+    chatGptRules = ["You are a helpful assistant.\n",
+                     "You will be a role playing master\n"] # TODO: will update more rules later -mugdha
+    return chatGptRules
+
 def main():
     print("Welcome to the ChatBot!")
     chatGptMessages = [
-        {"role": "system", "content": "You are a helpful assistant."}
+        {"role": "system", "content": get_chatGptRules()}
     ]
     while True:
         user_input = input("You: ")
