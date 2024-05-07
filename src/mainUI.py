@@ -11,6 +11,7 @@ from PIL import Image, ImageTk
 from Utilities import ChatBot
 from Utilities import TextToSpeech
 from Utilities import ImageGenerator
+from concurrent.futures import Future
 
 import simpleaudio as sa
 
@@ -19,6 +20,8 @@ if __name__ == "__main__" or __name__ == filename: # If the script is being run 
     from Utilities.Utilities import get_path_from_project_root
 else: # If the script is being imported
     from .Utilities.Utilities import get_path_from_project_root
+
+DEBUG = FALSE
 
 # GUI
 root = Tk()
@@ -38,14 +41,16 @@ realistic_office = "realistic office"
 animated_show = "animated tv show"
 
 chatGptMessages = [
-        {"role": "system", "content": "You are a table top role playing game dungeon master."}
+        {
+            "role": "system",
+            "content": """You are a table top role playing game dungeon master."""}
     ]
 
 executor = concurrent.futures.ThreadPoolExecutor()
 
 image_widget = None
 
-title_screen_flag = True
+title_audio_flag = True
 
 def play_audio_file(file_path, cancel_token=None):
     try:
@@ -78,9 +83,9 @@ def play_music():
     cancel_token = {"value": False}
     executor.submit(play_audio_on_loop, get_path_from_project_root("assets/Title-14.wav"), cancel_token=cancel_token)
 
-    global title_screen_flag
+    global title_audio_flag
     # Wait for the title screen flag to be turned off
-    while title_screen_flag:
+    while title_audio_flag:
         pass
 
     # Kill the title music and play the tavern music and chatter
@@ -128,7 +133,11 @@ def call_chatgpt(user_prompt, summary_future):
     gtp_scene_description = ChatBot.call_openai_and_update_chat_messages(user_prompt, chatGptMessages)
      
     # Generate the image from the scene description (non-blocking)
-    image_url_future = executor.submit(ImageGenerator.generate_image_url, f"Generate the following scene in the a {medieval_tavern} style, making sure to include a character that looks like aragorn from TLOTR, and don't include any text: {gtp_scene_description}")
+    if DEBUG:
+        image_url_future = Future()
+        image_url_future.set_result(get_path_from_project_root("assets/sample_tavern_art.png"))
+    else:
+        image_url_future = executor.submit(ImageGenerator.generate_image_url, f"Generate the following scene in the a {medieval_tavern} style, making sure to include a character that looks like aragorn from TLOTR, and don't include any text: {gtp_scene_description}")
 
     # Generate the speech file from the scene description (non-blocking)
     speech_file_future = executor.submit(generate_speech_file, gtp_scene_description)
@@ -136,16 +145,19 @@ def call_chatgpt(user_prompt, summary_future):
     # Wait for the summary speech, image gen, and speech gen (and music gen) to all finish
     concurrent.futures.wait([summary_future, speech_file_future, image_url_future])
 
-    # Turn off the title screen flag if it is still on
-    global title_screen_flag
-    title_screen_flag = False
+    # Turn off the title audio flag if it is still on
+    global title_audio_flag
+    title_audio_flag = False
 
     # Display the response
     add_text_to_chat_window(gtp_scene_description, "DungeonMaster")
 
     # Save the image to a file
-    image_path = get_path_from_project_root(f"generated/temp/temp{random.randint(0, 1000000)}.png")
-    save_image_from_url(image_url_future.result(), image_path)
+    if DEBUG:
+        image_path = image_url_future.result()
+    else:
+        image_path = get_path_from_project_root(f"generated/temp/temp{random.randint(0, 1000000)}.png")
+        save_image_from_url(image_url_future.result(), image_path)
 
     # Display the image and play the speech
     update_image_widget(image_widget, image_path)
@@ -229,7 +241,10 @@ root.bind('<Return>', lambda event: send())
 root.bind('<Configure>', enforce_aspect_ratio)
 
 ### Initial scene
-intro = "Welcome to the epic adventure that awaits you in Chat RPG. From mystical forests to ancient, bustling cities, explore an infinitely unfolding world shaped by your actions and decisions. With deep and complex NPCs, beautifully generated art, and epic narration, an exciting journey awaits you, if you are ready. Your adventure begins in an unassuming tavern."
+if DEBUG:
+    intro = "Hi, welcome to the game. Loading initial scene."
+else:
+    intro = "Welcome to the epic adventure that awaits you in Chat RPG. From mystical forests to ancient, bustling cities, explore an infinitely unfolding world shaped by your actions and decisions. With deep and complex NPCs, beautifully generated art, and epic narration, an exciting journey awaits you, if you are ready. Your adventure begins in an unassuming tavern."
 initial_prompt = "Set up an initial scene in a medieval tavern."
 
 # Display the response
