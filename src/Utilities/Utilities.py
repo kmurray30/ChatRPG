@@ -21,8 +21,8 @@ def get_project_root():
 
     return project_root
 
-# Example input: "audio/temp/temp.mp3"
-# Example output: "/path/to/project/audio/temp/temp.mp3"
+# Example input: "generated/temp/temp.mp3"
+# Example output: "/path/to/project/generated/temp/temp.mp3"
 def get_path_from_project_root(relative_path):
     # Get the root directory of the project
     project_root = get_project_root()

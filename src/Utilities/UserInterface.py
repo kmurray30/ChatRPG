@@ -29,22 +29,21 @@ chatGptMessages = [
     ]
 
 def create_image_widget(root, file_path):
-    # Open the image file
     img = Image.open(file_path)
-
-    # Create a PhotoImage object from the image
     photo = ImageTk.PhotoImage(img)
-
-    # Create a Label widget to display the image
     image_widget = Label(root, image=photo)
-
-    # Keep a reference to the image object to prevent it from being garbage collected
     image_widget.image = photo
-
-    # Keep a reference to the original image to allow resizing
     image_widget.original = img
 
     return image_widget
+
+def update_image_widget(file_path):
+    img = Image.open(file_path)
+    photo = ImageTk.PhotoImage(img)
+    global image_widget
+    image_widget.config(image=photo)
+    image_widget.image = photo
+    image_widget.original = img
 
 def add_text_to_chat_window(text, role):
     txt.config(state=NORMAL)
@@ -53,12 +52,16 @@ def add_text_to_chat_window(text, role):
 
 def call_chatgpt(user):
     # Call ChatGPT
-	response = ChatBot.call_openai_and_update_chat_messages(user, chatGptMessages)
+    response = ChatBot.call_openai_and_update_chat_messages(user, chatGptMessages)
 	
     # Display the response, color this text green
-	add_text_to_chat_window(response, "ChatGPT")
+    add_text_to_chat_window(response, "ChatGPT")
+     
+    # Update the image with a new one
+    new_file_path = get_path_from_project_root("assets/title_screen.png")
+    update_image_widget(new_file_path)
 
-	e.delete(0, END)
+    e.delete(0, END)
 	
 # Send function
 def send():
@@ -103,7 +106,7 @@ chat_frame.grid_rowconfigure(0, weight=1)  # Allocate extra space to row 0
 chat_frame.grid_columnconfigure(0, weight=1)  # Allocate extra space to column 0
 
 # Create image widget
-title_screen_path = get_path_from_project_root("assets/title_screen.png")
+title_screen_path = get_path_from_project_root("assets/dice.png")
 image_widget = create_image_widget(root, title_screen_path)
 image_widget.grid(row=0, column=1, sticky="W")
 

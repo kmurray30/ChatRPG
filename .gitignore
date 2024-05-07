@@ -7,5 +7,5 @@ notes/
 dalle/
 storage/*
 storage2/*
-audio/
+generated/
 build/out/

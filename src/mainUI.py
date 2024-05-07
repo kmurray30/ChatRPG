@@ -3,11 +3,16 @@ from tkinter import Label
 import os
 import concurrent.futures
 
+import urllib.request
+import random
+
 from PIL import Image, ImageTk
 
 from Utilities import ChatBot
 from Utilities import TextToSpeech
 from Utilities import ImageGenerator
+
+import simpleaudio as sa
 
 filename = os.path.splitext(os.path.basename(__file__))[0]
 if __name__ == "__main__" or __name__ == filename: # If the script is being run directly
@@ -40,10 +45,53 @@ executor = concurrent.futures.ThreadPoolExecutor()
 
 image_widget = None
 
+title_screen_flag = True
+
+def play_audio_file(file_path, cancel_token=None):
+    try:
+        # Load the audio file from the provided path
+        wave_obj = sa.WaveObject.from_wave_file(file_path)
+        
+        # Play the audio
+        play_obj = wave_obj.play()
+        
+        # Wait for the audio to finish playing
+        if cancel_token:
+            while not cancel_token["value"]:
+                pass
+            play_obj.stop()
+        else:
+            play_obj.wait_done()
+    except Exception as e:
+        print(f"An error occurred while playing the audio: {e}")
+
+def play_audio_on_loop(file_path, cancel_token=None):
+    if cancel_token:
+        while True and not cancel_token["value"]:
+            play_audio_file(file_path, cancel_token)
+    else:
+        while True:
+            play_audio_file(file_path)
+
+def play_music():
+    # Create a pointer to a boolean so it can be passed into the thread and modified here
+    cancel_token = {"value": False}
+    executor.submit(play_audio_on_loop, get_path_from_project_root("assets/Title-14.wav"), cancel_token=cancel_token)
+
+    global title_screen_flag
+    # Wait for the title screen flag to be turned off
+    while title_screen_flag:
+        pass
+
+    # Kill the title music and play the tavern music and chatter
+    cancel_token["value"] = True
+    executor.submit(play_audio_on_loop, get_path_from_project_root("assets/Tavern-20.wav"))
+    executor.submit(play_audio_on_loop, get_path_from_project_root("assets/Chatter-12.wav"))
+
 # Function to summarize and speak the user input
 def summarize_and_speak(prompt):
     summary = ChatBot.call_openai_without_context("Summarize this, but make it a bit longer (convert first person to second person and second person to third person): " + prompt)
-    executor.submit(TextToSpeech.convert_play_delete_text_to_speech_file(summary, summary_as_filename=True, delete=False))
+    executor.submit(TextToSpeech.convert_play_delete_text_to_speech_file, summary, summary_as_filename=True, delete=False)
 
 # Function to generate a speech file from the scene description
 def generate_speech_file(scene_description):
@@ -65,11 +113,15 @@ def update_image_widget(image_widget, file_path):
     photo = ImageTk.PhotoImage(img)
     image_widget.config(image=photo)
     image_widget.image = photo
+    image_widget.original = img
 
 def add_text_to_chat_window(text, role):
     txt.config(state=NORMAL)
-    txt.insert(END, role + " -> " + text + "\n", role)
+    txt.insert(END, role + " -> " + text + "\n\n\n\n", role)
     txt.config(state=DISABLED)
+
+def save_image_from_url(url, file_path):
+    urllib.request.urlretrieve(url, file_path)
 
 def call_chatgpt(user_prompt, summary_future):
     # Call ChatGPT
@@ -84,12 +136,20 @@ def call_chatgpt(user_prompt, summary_future):
     # Wait for the summary speech, image gen, and speech gen (and music gen) to all finish
     concurrent.futures.wait([summary_future, speech_file_future, image_url_future])
 
-    # Display the image and play the speech
-    update_image_widget(image_widget, image_url_future.result())
-    TextToSpeech.play_audio_file(speech_file_future.result())
+    # Turn off the title screen flag if it is still on
+    global title_screen_flag
+    title_screen_flag = False
 
-    # Display the response, color this text green
+    # Display the response
     add_text_to_chat_window(gtp_scene_description, "DungeonMaster")
+
+    # Save the image to a file
+    image_path = get_path_from_project_root(f"generated/temp/temp{random.randint(0, 1000000)}.png")
+    save_image_from_url(image_url_future.result(), image_path)
+
+    # Display the image and play the speech
+    update_image_widget(image_widget, image_path)
+    TextToSpeech.play_audio_file(speech_file_future.result())
     
     e.delete(0, END)
     e.config(state=NORMAL)
@@ -108,8 +168,8 @@ def send():
     # Summarize and speak the user input (non-blocking)
     summary_future = executor.submit(summarize_and_speak, user_prompt)
 	
-    # Call ChatGPT in a future thread
-    root.after(10, call_chatgpt, user_prompt, summary_future)
+    # Call ChatGPT in a separate thread. The only blocker should be the disabling of the text field
+    executor.submit(call_chatgpt, user_prompt, summary_future)
 
 def enforce_aspect_ratio(event):
     new_height = root.winfo_height() - 10
@@ -150,8 +210,8 @@ txt = Text(chat_frame, bg=BG_COLOR, fg=TEXT_COLOR, font=FONT, width=60)
 txt.grid(row=0, column=0, columnspan=2, sticky='NSWE')
 
 # Set chat window settings
-txt.tag_config("You", foreground="white") # Set the user text color to white
-txt.tag_config("DungeonMaster", foreground="green") # Set the ChatGPT text color to green
+txt.tag_config("You", foreground="green") # Set the user text color
+txt.tag_config("DungeonMaster", foreground="white") # Set the ChatGPT text color
 txt.config(state=DISABLED) # Disable the chat window for typing
 
 # Create a scrollbar
@@ -162,6 +222,7 @@ scrollbar.place(relheight=1, relx=0.974)
 e = Entry(chat_frame, bg="#2C3E50", fg=TEXT_COLOR, font=FONT)
 e.grid(row=1, column=0, columnspan=1, sticky='WSE', padx=0)
 e.focus_set()
+e.config(state=DISABLED) # Will be enabled after the ChatGPT response
 
 # Create a send button
 send_button = Button(chat_frame, text="Send", font=FONT_BOLD, bg=BG_GRAY,
@@ -175,31 +236,19 @@ root.bind('<Configure>', enforce_aspect_ratio)
 
 ### Initial scene
 intro = "Welcome to the epic adventure that awaits you in Chat RPG. From mystical forests to ancient, bustling cities, explore an infinitely unfolding world shaped by your actions and decisions. With deep and complex NPCs, beautifully generated art, and epic narration, an exciting journey awaits you, if you are ready. Your adventure begins in an unassuming tavern."
-prompt = "Set up an initial scene in a medieval tavern."
+initial_prompt = "Set up an initial scene in a medieval tavern."
+
+# Display the response
+add_text_to_chat_window(intro, "DungeonMaster")
+
+# Intro music
+executor.submit(play_music)
 
 # Intro speech
 intro_future = executor.submit(TextToSpeech.convert_play_delete_text_to_speech_file, intro, summary_as_filename=False, delete=True)
 
-# Get GPT scene description (blocking)
-gtp_scene_description = ChatBot.call_openai_and_update_chat_messages(prompt, chatGptMessages)
-
-# Generate the image from the scene description (non-blocking)
-image_url_future = executor.submit(ImageGenerator.generate_image_url, f"Generate the following scene in the a {medieval_tavern} style, making sure to include a character that looks like aragorn from TLOTR, and don't include any text: {gtp_scene_description}")
-
-# Generate the speech file from the scene description (non-blocking)
-speech_file_future = executor.submit(generate_speech_file, gtp_scene_description)
-
-# Generate the music for the scene
-# TODO: implement this
-
-# Wait for the summary speech, image gen, and speech gen (and music gen) to all finish
-concurrent.futures.wait([intro_future, speech_file_future, image_url_future])
-
-# Display the image and play the speech
-update_image_widget(image_widget, image_url_future.result())
-TextToSpeech.play_audio_file(speech_file_future.result())
-
-add_text_to_chat_window(gtp_scene_description, "DungeonMaster")
+# Call ChatGPT in a future thread
+executor.submit(call_chatgpt, initial_prompt, intro_future)
 
 # Start the GUI
 root.mainloop()

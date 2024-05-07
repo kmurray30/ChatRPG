@@ -36,8 +36,8 @@ def play_audio_file(file_path):
         print(f"An error occurred while playing the audio: {e}")
 
 def delete_audio_file(file_path):
-    # only delete audio files in the audio directory
-    if os.path.exists(file_path) and "/audio/" in file_path and Path(file_path).suffix == ".wav":
+    # only delete audio files in the generated directory
+    if os.path.exists(file_path) and "/generated/" in file_path and Path(file_path).suffix == ".wav":
         os.remove(file_path)
     else:
         print("The file does not exist")
@@ -58,9 +58,9 @@ def convert_text_to_speech_file(prompt, file_path):
 def create_file_path(prompt, summary_as_filename=False, delete=True):
     # Generate a file name based on the user input, or some generic name
     if delete:
-        path = get_path_from_project_root("audio/temp/")
+        path = get_path_from_project_root("generated/temp/")
     else:
-        path = get_path_from_project_root("audio/")
+        path = get_path_from_project_root("generated/")
     if summary_as_filename:
         summary = call_openai_without_context("Summarize the following into 1-4 words (and no special characters): " + prompt).rstrip('.')
         speech_file_name = f"{summary}.wav"
