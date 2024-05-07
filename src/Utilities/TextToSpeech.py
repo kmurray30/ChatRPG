@@ -1,7 +1,6 @@
 import os
 from pathlib import Path
 from os import environ
-# environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1'
 
 import openai
 # from dotenv import load_dotenv
@@ -52,6 +51,7 @@ def convert_text_to_speech_file(prompt, file_path):
         if response.status_code != 200:
             print(f"Failed to convert the text to speech. Status code: {response.status_code}")
             return
+        print("response: ", response)
         os.makedirs(os.path.dirname(file_path), exist_ok=True)
         response.stream_to_file(file_path)
 
@@ -75,7 +75,9 @@ def convert_play_delete_text_to_speech_file(prompt, summary_as_filename=False, d
     speech_file_path = create_file_path(prompt, summary_as_filename, delete)
 
     # Generate the speech file
+    print("DEBUG1")
     convert_text_to_speech_file(prompt, speech_file_path)
+    print("DEBUG2")
 
     # Play the speech file
     play_audio_file(speech_file_path)

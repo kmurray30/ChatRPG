@@ -2,6 +2,7 @@ from tkinter import *
 from tkinter import Label
 import os
 import concurrent.futures
+import sys
 
 import urllib.request
 import random
@@ -45,7 +46,6 @@ chatGptMessages = [
             "role": "system",
             "content": """
             You are a table top role playing game dungeon master.
-            Use the keyword 'PANELCHANGE' every time something different is described, for example: 'PANELCHANGE: his expression changes, PANELCHANGE: across the bar you see a hooded man, PANELCHANGE: the bar bursts into cheers'
             """}
     ]
 
@@ -54,6 +54,14 @@ executor = concurrent.futures.ThreadPoolExecutor()
 image_widget = None
 
 title_audio_flag = True
+
+def get_asset_from_root_path(relative_path):
+    if getattr(sys, 'frozen', False):
+        # The application is running in a PyInstaller bundle
+        return os.path.join(sys._MEIPASS, relative_path)
+    else:
+        # The application is running in a normal Python environment
+        return get_path_from_project_root(relative_path)
 
 def play_audio_file(file_path, cancel_token=None):
     try:
@@ -84,7 +92,7 @@ def play_audio_on_loop(file_path, cancel_token=None):
 def play_music():
     # Create a pointer to a boolean so it can be passed into the thread and modified here
     cancel_token = {"value": False}
-    executor.submit(play_audio_on_loop, get_path_from_project_root("assets/Title-14.wav"), cancel_token=cancel_token)
+    executor.submit(play_audio_on_loop, get_asset_from_root_path("assets/Title-14.wav"), cancel_token=cancel_token)
 
     global title_audio_flag
     # Wait for the title screen flag to be turned off
@@ -93,12 +101,12 @@ def play_music():
 
     # Kill the title music and play the tavern music and chatter
     cancel_token["value"] = True
-    executor.submit(play_audio_on_loop, get_path_from_project_root("assets/Tavern-20.wav"))
-    executor.submit(play_audio_on_loop, get_path_from_project_root("assets/Chatter-12.wav"))
+    executor.submit(play_audio_on_loop, get_asset_from_root_path("assets/Tavern-20.wav"))
+    executor.submit(play_audio_on_loop, get_asset_from_root_path("assets/Chatter-12.wav"))
 
 # Function to summarize and speak the user input
 def summarize_and_speak(prompt):
-    summary = ChatBot.call_openai_without_context("Summarize this, but make it a bit longer (convert first person to second person and second person to third person): " + prompt)
+    summary = ChatBot.call_openai_without_context("Repeat back my proposed actions to me, and make a brief comment asking the character to hang tight while the scene is generated: " + prompt)
     executor.submit(TextToSpeech.convert_play_delete_text_to_speech_file, summary, summary_as_filename=True, delete=False)
 
 # Function to generate a speech file from the scene description
@@ -138,7 +146,7 @@ def call_chatgpt(user_prompt, summary_future):
     # Generate the image from the scene description (non-blocking)
     if DEBUG:
         image_url_future = Future()
-        image_url_future.set_result(get_path_from_project_root("assets/sample_tavern_art.png"))
+        image_url_future.set_result(get_asset_from_root_path("assets/sample_tavern_art.png"))
     else:
         image_url_future = executor.submit(ImageGenerator.generate_image_url, f"Generate the following scene in the a {medieval_tavern} style, making sure to include a character that looks like aragorn from TLOTR, and don't include any text: {gtp_scene_description}")
 
@@ -167,13 +175,17 @@ def call_chatgpt(user_prompt, summary_future):
     TextToSpeech.play_audio_file(speech_file_future.result())
     
     e.config(state=NORMAL)
+    send_button.config(state=NORMAL)
     e.delete(0, END)
 	
 # Send function
 def send():
     user_prompt = "" + e.get()
+    if user_prompt == "":
+        return
     e.delete(0, END) # Clear the input field
     e.config(state=DISABLED)
+    send_button.config(state=DISABLED)
 
     # Display the user input
     add_text_to_chat_window(user_prompt, "You")
@@ -214,7 +226,7 @@ chat_frame.grid_rowconfigure(0, weight=1)  # Allocate extra space to row 0
 chat_frame.grid_columnconfigure(0, weight=1)  # Allocate extra space to column 0
 
 # Create image widget
-title_screen_path = get_path_from_project_root("assets/title_screen.png")
+title_screen_path = get_asset_from_root_path("assets/title_screen.png")
 image_widget = create_image_widget(root, title_screen_path)
 image_widget.grid(row=0, column=1, sticky="W")
 
@@ -237,6 +249,7 @@ e.config(state=DISABLED) # Will be enabled after the ChatGPT response
 send_button = Button(chat_frame, text="Send", font=FONT_BOLD, bg=BG_GRAY,
 			command=send)
 send_button.grid(row=1, column=1, sticky='WS', padx=0)
+send_button.config(state=DISABLED) # Disabled until the user is allowed to type something
 
 # Bind the Enter key to the send function
 root.bind('<Return>', lambda event: send())
