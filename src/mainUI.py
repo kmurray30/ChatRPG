@@ -151,19 +151,17 @@ def call_chatgpt(user_prompt, summary_future):
     update_image_widget(image_widget, image_path)
     TextToSpeech.play_audio_file(speech_file_future.result())
     
-    e.delete(0, END)
     e.config(state=NORMAL)
+    e.delete(0, END)
 	
 # Send function
 def send():
-    send = "" + e.get()
+    user_prompt = "" + e.get()
+    e.delete(0, END) # Clear the input field
     e.config(state=DISABLED)
 
     # Display the user input
-    add_text_to_chat_window(send, "You")
-    
-    user_prompt = e.get().lower()
-    e.delete(0, END) # Clear the input field
+    add_text_to_chat_window(user_prompt, "You")
      
     # Summarize and speak the user input (non-blocking)
     summary_future = executor.submit(summarize_and_speak, user_prompt)
@@ -206,17 +204,13 @@ image_widget = create_image_widget(root, title_screen_path)
 image_widget.grid(row=0, column=1, sticky="W")
 
 # Create Main Chat Area
-txt = Text(chat_frame, bg=BG_COLOR, fg=TEXT_COLOR, font=FONT, width=60)
+txt = Text(chat_frame, bg=BG_COLOR, fg=TEXT_COLOR, font=FONT, width=60, wrap=WORD)
 txt.grid(row=0, column=0, columnspan=2, sticky='NSWE')
 
 # Set chat window settings
 txt.tag_config("You", foreground="green") # Set the user text color
 txt.tag_config("DungeonMaster", foreground="white") # Set the ChatGPT text color
 txt.config(state=DISABLED) # Disable the chat window for typing
-
-# Create a scrollbar
-scrollbar = Scrollbar(txt)
-scrollbar.place(relheight=1, relx=0.974)
 
 # Create the text input field
 e = Entry(chat_frame, bg="#2C3E50", fg=TEXT_COLOR, font=FONT)
