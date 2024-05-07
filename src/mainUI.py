@@ -43,7 +43,10 @@ animated_show = "animated tv show"
 chatGptMessages = [
         {
             "role": "system",
-            "content": """You are a table top role playing game dungeon master."""}
+            "content": """
+            You are a table top role playing game dungeon master.
+            Use the keyword 'PANELCHANGE' every time something different is described, for example: 'PANELCHANGE: his expression changes, PANELCHANGE: across the bar you see a hooded man, PANELCHANGE: the bar bursts into cheers'
+            """}
     ]
 
 executor = concurrent.futures.ThreadPoolExecutor()
