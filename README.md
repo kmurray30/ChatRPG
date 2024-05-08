@@ -1,5 +1,10 @@
 # AIGameHackathon
 
+## Running Instructions
+1. You can try using the executable uploading directly here (ChatRPG_MacOS or ChatRPG_Windows). This should have our API keys bundled inside and hopefully work without a hitch
+   1. If you get any error messages, see if you can resolve them (you may need to brew/chocolately install a dependency or two, but hopefully not)
+3. If this does not work, you will need to follow all of the instructions below to set up your computer, including adding your own API keys to the .env file
+
 ## Computer Setup
 
 Depending how much coding you've done before, you may need to install some things on your computer to get started. Here we'll install homebrew, python3, git, vscode, and the vscode extensions we'll be using.
